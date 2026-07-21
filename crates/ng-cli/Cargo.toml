@@ -1,0 +1,24 @@
+[package]
+name = "ng-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "ng"
+path = "src/main.rs"
+
+[dependencies]
+ng-core.workspace = true
+ng-adapters = { path = "../ng-adapters" }
+ng-sessions = { path = "../ng-sessions" }
+serde_json.workspace = true
+anyhow.workspace = true
+clap = { version = "4", features = ["derive"] }
+clap_complete = "4"
+dirs.workspace = true
+libc = "0.2"
+rusqlite.workspace = true
+
+[dev-dependencies]
+tempfile = "3"

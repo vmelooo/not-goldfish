@@ -1,0 +1,27 @@
+[package]
+name = "ng-hook"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+name = "ng_hook"
+path = "src/lib.rs"
+
+[[bin]]
+name = "ng-hook"
+path = "src/main.rs"
+
+[dependencies]
+ng-core.workspace = true
+ng-sessions = { path = "../ng-sessions" }
+serde.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+tempfile = "3"
+criterion.workspace = true
+
+[[bench]]
+name = "inject_bench"
+harness = false

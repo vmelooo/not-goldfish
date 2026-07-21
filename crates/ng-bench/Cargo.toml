@@ -1,0 +1,44 @@
+[package]
+name = "ng-bench"
+version = { workspace = true }
+edition = { workspace = true }
+license = { workspace = true }
+publish = false
+
+# Reproducible offline "with vs without not-goldfish" study (LoCoMo-style).
+# Consumes ng-core's PUBLIC API only; never mutates ng-core/ngd/etc.
+
+[[bin]]
+name = "ng-bench"
+path = "src/main.rs"
+
+# Stress harness de escala extrema (docs/benchmarks/stress-test.md): mede as
+# invariantes do produto sob 10k-1M eventos em bancos temporários isolados.
+[[bin]]
+name = "ng-stress"
+path = "src/bin/stress.rs"
+
+[lib]
+name = "ng_bench"
+path = "src/lib.rs"
+
+[dependencies]
+ng-core = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+# O stress mede o caminho real do hook (ng_hook::inject::build_injection_readonly)
+# e o rewrite atômico de transcripts (ng_sessions::rewrite::rewrite_jsonl).
+ng-hook = { path = "../ng-hook" }
+ng-sessions = { path = "../ng-sessions" }
+# PRAGMA integrity_check/quick_check direto no banco de teste (a conn do
+# Store é privada por design).
+rusqlite = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3"
+
+[features]
+# Forwards to ng-core's semantic embedder. Off by default: the study runs
+# fully with HashEmbedder. Turn on + set NG_EMBED_MODEL to add the m2v arm.
+model2vec = ["ng-core/model2vec"]

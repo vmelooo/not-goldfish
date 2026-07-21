@@ -1,0 +1,14 @@
+{
+  "sessionId": "gem-session-1",
+  "history": [
+    {"role": "user", "parts": [{"text": "Explain what this repo does."}]},
+    {"role": "model", "parts": [{"text": "It's a context daemon for AI coding sessions."}]},
+    {"role": "user", "parts": [{"text": "Now run the tests."}]},
+    {"role": "model", "parts": [{"functionCall": {"name": "run_shell_command", "args": {"command": "cargo test"}}}]},
+    {"role": "user", "parts": [{"functionResponse": {"name": "run_shell_command", "response": {"output": "23 passed"}}}]},
+    {"role": "model", "parts": [{"text": "All 23 tests passed."}]},
+    {"role": "model", "parts": []},
+    {"parts": [{"text": "entry with no role at all"}]},
+    {"role": "system"}
+  ]
+}

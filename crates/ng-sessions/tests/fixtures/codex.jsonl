@@ -1,0 +1,8 @@
+{"timestamp":"2026-07-18T10:00:00Z","type":"session_meta","payload":{"id":"sess-1","cwd":"/home/dev/proj"}}
+{"timestamp":"2026-07-18T10:00:01Z","type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"add a retry to the http client"}]}}
+{"timestamp":"2026-07-18T10:00:02Z","type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"I'll wrap the request in a retry loop."}]}}
+{"timestamp":"2026-07-18T10:00:03Z","type":"response_item","payload":{"type":"function_call","name":"shell","arguments":"{\"command\":[\"cat\",\"http.rs\"]}","call_id":"c1"}}
+{"timestamp":"2026-07-18T10:00:04Z","type":"response_item","payload":{"type":"function_call_output","call_id":"c1","output":"pub fn get(url: &str) {}"}}
+not valid json here {{{
+{"timestamp":"2026-07-18T10:00:05Z","type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"Added exponential backoff with 3 retries."}]}}
+{"timestamp":"2026-07-18T10:00:06Z","type":"response_item","payload":{"type":"reasoning","summary":["thinking about edge cases"]}}

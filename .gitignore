@@ -1,0 +1,45 @@
+/target
+*.ng-backup
+*.ng-bak
+
+# oh-my-claudecode / OMC operational state — session logs, checkpoints,
+# never meant to be public or shared across machines.
+.omc/
+
+# Serena MCP local project config — per-machine tooling, not project source.
+.serena/
+
+# ng-bench raw run output (results/latest.json is regenerated, not source).
+crates/ng-bench/results/
+
+# scratch/temp
+scratchpad/
+tmp/
+*.tmp
+
+# material de divulgação local (post + imagens exportadas), não é fonte do projeto
+linkedin-post/
+
+# editor cruft
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Artefatos de processo gerados por IA — não publicar (local-only)
+/docs/superpowers/
+/docs/research/
+/plans/
+/linkedin-post/
+/tasks/
+
+# Estado local de ferramentas de orquestração/IA e captura de tela — nunca público
+.superpowers/
+.playwright-mcp/
+.omx/
+crates/ng-bench/examples/seed_demo.rs

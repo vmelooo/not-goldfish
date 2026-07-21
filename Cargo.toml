@@ -1,0 +1,37 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/ng-core",
+    "crates/ngd",
+    "crates/ng-hook",
+    "crates/ng-cli",
+    "crates/ng-sessions",
+    "crates/ng-adapters",
+    "crates/ng-bench",
+]
+
+[workspace.package]
+version = "0.2.0"
+edition = "2021"
+license = "MIT"
+
+[workspace.dependencies]
+ng-core = { path = "crates/ng-core" }
+rusqlite = { version = "0.31", features = ["bundled"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "1"
+anyhow = "1"
+dirs = "5"
+toml = "0.8"
+# Embedder semântico real (opt-in via feature `model2vec` do ng-core).
+# `local-only` = sem stack de rede (hf-hub/ureq): só carrega modelos já no
+# disco, mantendo a árvore de deps enxuta e o build offline-safe. `onig` é o
+# backend de tokenização recomendado para uso local (compila a partir de
+# fontes vendored, como o SQLite bundled — nenhuma lib de sistema).
+model2vec-rs = { version = "0.2.1", default-features = false, features = ["onig", "local-only"] }
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[profile.release]
+lto = true
+strip = true

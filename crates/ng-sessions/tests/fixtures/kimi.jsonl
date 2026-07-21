@@ -1,0 +1,6 @@
+{"role":"user","content":"Why is the build failing on CI but not locally?"}
+{"role":"assistant","content":[{"type":"text","text":"Likely a toolchain version mismatch, let me check the CI config."}]}
+{"type":"tool","content":[{"type":"tool_use","name":"cat",  "input":{"path":".github/workflows/ci.yml"}}]}
+{{{ not json
+{"role":"assistant","content":[{"type":"tool_result","content":"rust-toolchain: 1.70 vs local 1.75"}]}
+{"role":"assistant","content":"Pinning the CI toolchain to 1.75 fixed it."}

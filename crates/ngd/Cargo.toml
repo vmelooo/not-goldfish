@@ -1,0 +1,29 @@
+[package]
+name = "ngd"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+name = "ngd"
+path = "src/lib.rs"
+
+[[bin]]
+name = "ngd"
+path = "src/main.rs"
+
+[dependencies]
+ng-core.workspace = true
+ng-sessions = { path = "../ng-sessions" }
+ng-adapters = { path = "../ng-adapters" }
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+dirs.workspace = true
+libc = "0.2"
+axum = "0.7"
+tokio = { version = "1", features = ["rt-multi-thread", "net", "macros"] }
+
+[dev-dependencies]
+tempfile = "3"
+tower = { version = "0.4", features = ["util"] }

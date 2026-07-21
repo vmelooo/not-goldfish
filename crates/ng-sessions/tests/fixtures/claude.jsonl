@@ -1,0 +1,10 @@
+{"type":"user","message":{"role":"user","content":"Can you fix the login bug in auth.rs?"},"uuid":"u1","cwd":"/home/dev/proj"}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"Sure, let me look at auth.rs first."},{"type":"tool_use","id":"t1","name":"Read","input":{"path":"auth.rs"}}]},"uuid":"a1","cwd":"/home/dev/proj"}
+{"type":"user","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"t1","content":"fn login() { /* ... */ }"}]},"uuid":"u2","cwd":"/home/dev/proj"}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"text","text":"Found it, the token comparison uses == instead of a constant-time check."}]},"uuid":"a2","cwd":"/home/dev/proj"}
+this line is not json at all
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"t2","name":"Edit","input":{"path":"auth.rs","old":"a==b","new":"constant_time_eq(a,b)"}}]},"uuid":"a3","cwd":"/home/dev/proj"}
+{"type":"user","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"t2","content":"ok"}]},"uuid":"u3","cwd":"/home/dev/proj"}
+{"type":"summary","summary":"Fixed timing-safe comparison in login","leafUuid":"a3"}
+{"type":"assistant","message":{"role":"assistant","content":"Done, the fix is committed."},"uuid":"a4","cwd":"/home/dev/proj"}
+{"type":"unknown_future_type","weird":{"nested":true}}

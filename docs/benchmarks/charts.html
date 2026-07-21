@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>not-goldfish · benchmark COM vs SEM</title>
+<style>
+  /* ================================================================
+     Tokens neobrutalistas — mesmo contrato da web UI (ngd/ui.html).
+     Tema claro default; escuro segue o SO via prefers-color-scheme
+     (os SVGs das figuras têm a mesma media query interna).
+     Regra dura de contraste: ouro NUNCA é texto sobre fundo claro —
+     sobre ouro o texto é sempre tinta escura (--on-gold); como cor
+     de texto usa-se --acc-gold (escurecido no tema claro).
+     ================================================================ */
+  :root{
+    --surface:#FBFBF9; --elevated:#FFFFFF; --surface-2:#EEF0F3;
+    --text:#1C293C; --border:#1C293C; --shadow:#1C293C;
+    --gold:#FDC800; --violet:#432DD7; --on-gold:#1C293C;
+    --ok:#0B7A38; --danger:#D0261C;
+    --muted:#46566B;
+    --acc-gold:#8A6B00; --acc-violet:#432DD7; --acc-green:#0B7A38; --acc-red:#C21F15;
+    --gold-tint:rgba(253,200,0,.18);
+    /* escalas: espaçamento 4/8/12/16/24/32, tipo 13/15/17/21/27/35 */
+    --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:24px; --s6:32px;
+    --f1:13px; --f2:15px; --f3:17px; --f4:21px; --f5:27px; --f6:35px;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --surface:#16181D; --elevated:#1E2128; --surface-2:#272B34;
+      --text:#F2EFE6; --border:#F2EFE6; --shadow:#432DD7;
+      --violet:#B197FC;
+      --muted:#A7AFBD;
+      --acc-gold:#FDC800; --acc-violet:#B197FC; --acc-green:#3DD68C; --acc-red:#FF6B60;
+      --gold-tint:rgba(253,200,0,.14);
+      color-scheme:dark;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--surface);color:var(--text);font-family:var(--sans);font-size:var(--f2);line-height:1.6;
+    -webkit-font-smoothing:antialiased;padding:0 var(--s5) 64px}
+  ::selection{background:var(--gold);color:var(--on-gold)}
+  :focus-visible{outline:3px solid var(--violet);outline-offset:2px}
+  .wrap{max-width:980px;margin:0 auto}
+  header.top{padding:48px 0 var(--s6);border-bottom:3px solid var(--border);margin-bottom:var(--s6);position:relative}
+  .kicker{display:inline-block;background:var(--gold);color:var(--on-gold);border:2px solid var(--border);
+    box-shadow:3px 3px 0 var(--shadow);padding:2px var(--s3);font-family:var(--mono);font-size:var(--f1);
+    font-weight:700;letter-spacing:.18em;text-transform:uppercase}
+  h1{font-family:var(--sans);font-weight:800;font-size:clamp(27px,5.4vw,var(--f6));line-height:1.05;margin:var(--s4) 0 var(--s3);letter-spacing:-.02em;text-transform:uppercase}
+  .sub{color:var(--muted);max-width:66ch;margin:0}
+  h2{font-family:var(--sans);font-weight:800;font-size:var(--f4);margin:48px 0 var(--s2);letter-spacing:-.01em}
+  h2 .n{display:inline-block;background:var(--gold);color:var(--on-gold);border:2px solid var(--border);
+    font-family:var(--mono);font-size:var(--f1);font-weight:700;padding:0 var(--s2);margin-right:var(--s3);vertical-align:3px}
+  .lead{color:var(--muted);margin:0 0 var(--s5);max-width:72ch}
+  .hero{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4);margin-top:var(--s6)}
+  .stat{background:var(--elevated);border:2px solid var(--border);border-radius:0;box-shadow:4px 4px 0 var(--shadow);padding:var(--s5) var(--s4)}
+  .stat .n{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:var(--f6);font-weight:800;line-height:1;color:var(--acc-gold)}
+  .stat.teal .n{color:var(--acc-green)}
+  .stat.coral .n{color:var(--acc-red)}
+  .stat .l{color:var(--muted);font-size:var(--f1);margin-top:var(--s3)}
+  .card{background:var(--elevated);border:2px solid var(--border);border-radius:0;box-shadow:4px 4px 0 var(--shadow);padding:var(--s5);margin-top:var(--s4);overflow-x:auto}
+  figure{margin:var(--s4) 0 0;background:var(--elevated);border:2px solid var(--border);box-shadow:4px 4px 0 var(--shadow);padding:var(--s4)}
+  figure img{width:100%;display:block}
+  figcaption{color:var(--muted);font-size:var(--f1);margin-top:var(--s2);font-family:var(--mono)}
+  table{border-collapse:collapse;width:100%;font-size:var(--f1);font-variant-numeric:tabular-nums;min-width:640px}
+  th,td{text-align:right;padding:var(--s2) var(--s3);border-bottom:1px solid var(--border)}
+  th:first-child,td:first-child{text-align:left}
+  thead th{color:var(--text);font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:var(--f1);font-family:var(--mono);border-bottom:3px solid var(--border)}
+  tbody tr:last-child td{border-bottom:0}
+  tbody tr:hover{background:var(--gold-tint)}
+  .pill{display:inline-block;padding:1px var(--s2);border-radius:0;font-size:var(--f1);border:2px solid var(--border);font-family:var(--mono);font-weight:700}
+  .pill.good{background:var(--ok);color:#FFFFFF}
+  .pill.gold{background:var(--gold);color:var(--on-gold)}
+  .pill.bad{background:var(--danger);color:#FFFFFF}
+  .beforeafter{display:grid;grid-template-columns:1fr 1fr;gap:var(--s4);margin-top:var(--s4)}
+  .ba{background:var(--elevated);border:2px solid var(--border);border-radius:0;box-shadow:4px 4px 0 var(--shadow);padding:var(--s4) var(--s5)}
+  .ba .t{font-size:var(--f1);text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-family:var(--mono);font-weight:700}
+  .ba .metric{display:flex;justify-content:space-between;align-items:baseline;margin-top:var(--s4);font-family:var(--mono)}
+  .ba .metric b{font-size:var(--f5);font-variant-numeric:tabular-nums}
+  .ba.after{border-width:3px;box-shadow:6px 6px 0 var(--gold)}
+  .good{color:var(--acc-green)} .gold{color:var(--acc-gold)} .bad{color:var(--acc-red)}
+  .note{background:var(--elevated);border:2px solid var(--border);border-left:6px solid var(--gold);border-radius:0;box-shadow:4px 4px 0 var(--shadow);padding:var(--s4) var(--s5);margin-top:var(--s4);color:var(--muted);font-size:var(--f2)}
+  .note b{color:var(--text)}
+  .grid-tasks{font-family:var(--mono);font-size:var(--f1);display:grid;grid-template-columns:1fr repeat(3,72px);gap:var(--s1) var(--s3);align-items:center;min-width:560px}
+  .grid-tasks .hd{color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-size:var(--f1);text-align:center}
+  .grid-tasks .sep{grid-column:1/-1;color:var(--acc-gold);font-size:var(--f1);letter-spacing:.14em;text-transform:uppercase;margin-top:var(--s3);border-bottom:2px solid var(--gold);padding-bottom:var(--s1)}
+  .c{text-align:center}
+  .foot{margin-top:48px;padding-top:var(--s5);border-top:3px solid var(--border);color:var(--muted);font-size:var(--f1);font-family:var(--mono)}
+  code{background:var(--surface-2);border:1px solid var(--border);padding:0 var(--s1);font-size:var(--f1);font-family:var(--mono)}
+  a{color:var(--acc-violet);text-decoration-thickness:2px;text-underline-offset:2px}
+  @media (max-width:720px){.hero{grid-template-columns:1fr}.beforeafter{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="kicker">not-goldfish · estudo de retrieval</div>
+    <h1>Com a ferramenta vs. sem ela</h1>
+    <p class="sub">Estudo offline, determinístico e reprodutível (estilo LoCoMo/mem0): um fato é plantado numa
+    sessão e cobrado numa sessão posterior. <strong>16 tarefas</strong> em duas classes — 10 lexical-overlap,
+    6 semantic-gap — sobre <strong>72 eventos</strong>. Claude Code puro vs. Claude Code puro + not-goldfish,
+    sem nenhuma outra ferramenta no circuito.</p>
+    <div class="hero">
+      <div class="stat"><div class="n">81%</div><div class="l">acurácia global com model2vec + recall ANN — a melhor do estudo (FTS: 75%)</div></div>
+      <div class="stat teal"><div class="n">~95%</div><div class="l">menos tokens que reempilhar o histórico inteiro (~1 774 → ~95 tok/consulta)</div></div>
+      <div class="stat coral"><div class="n">33→50%</div><div class="l">gap semântico: o recall ANN recupera fatos que o FTS nunca casa</div></div>
+    </div>
+  </header>
+
+  <section>
+    <h2><span class="n">01</span>Custo de token por consulta</h2>
+    <p class="lead">Sem memória o agente erra (0%). Reler o histórico inteiro acerta, mas custa ~1 774 tokens por
+    consulta. A injeção entrega o mesmo fato em ~95–108 tokens.</p>
+    <figure>
+      <img src="bench-tokens.svg" alt="Barras desenhadas à mão comparando ~1774 tokens do replay completo com ~95 da injeção not-goldfish, 95% menos tokens">
+      <figcaption>fig. 1 — replay vs. injeção (valores da classe lexical-overlap; a economia exata cresce com o histórico)</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="n">02</span>Acurácia por cenário</h2>
+    <p class="lead">O resultado global (16 tarefas): a injeção empata em recall com o replay na classe lexical e
+    o embedder real + ANN entrega a melhor acurácia geral.</p>
+    <figure>
+      <img src="bench-accuracy.svg" alt="Barras desenhadas à mão: sem memória 0%, replay 100%, FTS 75%, híbrido 75%, model2vec com ANN 81%">
+      <figcaption>fig. 2 — acurácia = ouro no top-3 · 75% = 10/10 lexical + 2/6 gap · 81% = 10/10 + 3/6</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="n">03</span>O split que a auditoria exigiu</h2>
+    <p class="lead">A média única escondia o ponto fraco. Separadas as classes: o FTS vence onde a query reusa as
+    palavras do fato; no gap semântico, só o embedder real move o ponteiro.</p>
+    <figure>
+      <img src="bench-by-class.svg" alt="Barras agrupadas por classe: lexical 100% nos três braços; semantic-gap 33%, 33% e 50%">
+      <figcaption>fig. 3 — acurácia por classe × braço</figcaption>
+    </figure>
+    <div class="card">
+      <table>
+        <thead><tr><th>lexical-overlap (10)</th><th>acc</th><th>MRR</th><th>inj. tok</th><th>econ. on-found</th><th>grounded</th></tr></thead>
+        <tbody>
+          <tr><td>SEM — full-context replay</td><td>100%</td><td>1,00</td><td>1 773</td><td>base</td><td>100%</td></tr>
+          <tr><td>COM — FTS</td><td><b>100%</b></td><td>0,90</td><td>108</td><td><span class="pill good">93,9%</span></td><td>100%</td></tr>
+          <tr><td>COM — híbrido (hash)</td><td><b>100%</b></td><td>0,90</td><td>101</td><td><span class="pill good">94,3%</span></td><td>100%</td></tr>
+          <tr><td>COM — m2v + recall ANN</td><td><b>100%</b></td><td>0,85</td><td>102</td><td><span class="pill good">94,3%</span></td><td>100%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <table>
+        <thead><tr><th>semantic-gap (6)</th><th>acc</th><th>MRR</th><th>inj. tok</th><th>econ. on-found</th><th>grounded</th></tr></thead>
+        <tbody>
+          <tr><td>SEM — full-context replay</td><td>100%</td><td>1,00</td><td>1 774</td><td>base</td><td>100%</td></tr>
+          <tr><td>COM — FTS</td><td><b class="bad">33%</b></td><td>0,33</td><td>73</td><td><span class="pill bad">94,8%*</span></td><td>33%</td></tr>
+          <tr><td>COM — híbrido (hash)</td><td><b class="bad">33%</b></td><td>0,33</td><td>69</td><td><span class="pill bad">94,8%*</span></td><td>33%</td></tr>
+          <tr><td>COM — m2v + recall ANN</td><td><b class="gold">50%</b></td><td>0,50</td><td>86</td><td><span class="pill gold">94,2%*</span></td><td>50%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note">* A economia "on-found" mede só as tarefas acertadas. <b>Não leia ~94% como vitória no gap</b> —
+    nas que erraram, o braço não entregou nada. A história real desta classe é a coluna de acurácia.</div>
+  </section>
+
+  <section>
+    <h2><span class="n">04</span>O gap semântico e o conserto</h2>
+    <p class="lead">A auditoria provou que nenhum embedder ajudava no desenho <em>rerank-only</em> — o cosseno só
+    reordenava o que o FTS já achou. O recall ANN (top-50 por cosseno fundido ao pool FTS) destravou o gap:</p>
+    <div class="beforeafter">
+      <div class="ba"><div class="t">Antes — rerank-only (qualquer embedder)</div>
+        <div class="metric"><span>acurácia no gap</span><b class="bad">33%</b></div>
+        <div class="metric"><span>MRR</span><b class="bad">0,33</b></div>
+      </div>
+      <div class="ba after"><div class="t">Depois — m2v + recall ANN (plano 011)</div>
+        <div class="metric"><span>acurácia no gap</span><b class="gold">50% ↑</b></div>
+        <div class="metric"><span>MRR</span><b class="gold">0,50 ↑</b></div>
+      </div>
+    </div>
+    <figure>
+      <img src="bench-semantic-gap.svg" alt="Barras desenhadas à mão do gap semântico: FTS 33%, híbrido 33%, model2vec com recall ANN 50%">
+      <figcaption>fig. 4 — os 3 misses restantes são de ranking, não de recuperação: teto de similaridade deste embedder</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="n">05</span>Por tarefa</h2>
+    <p class="lead">Cada tarefa, cada braço: onde o ouro cai no top-3. As 4 full-gap são irrecuperáveis por FTS
+    por construção — a prova de que o ouro não foi definido por recuperabilidade.</p>
+    <figure>
+      <img src="bench-per-task.svg" alt="Grade 16 tarefas × 3 braços com checks e cruzes desenhados à mão">
+      <figcaption>fig. 5 — ✓ ouro no top-3 · ✗ miss · sg-ordenacao-en (query EN sobre ouro PT) só o m2v+ANN recupera, em 1º</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2><span class="n">06</span>Limites honestos</h2>
+    <div class="card" style="border-left:3px solid var(--gold)">
+      <p style="margin:.2em 0"><b>A economia exata depende do tamanho do histórico.</b> 94,7% é função do corpus
+      (~1 774 tok de replay); o robusto é a ordem de grandeza (injeção limitada ≪ replay total), não o dígito.</p>
+      <p style="margin:.6em 0 .2em"><b>Contra um oráculo que já sabe onde o fato está, a economia some</b> (FTS −12%):
+      se a localização é óbvia, injetar 3 snippets custa mais que reler a sessão certa (~84 tok).</p>
+      <p style="margin:.6em 0 .2em"><b>50% é o teto deste embedder no gap.</b> Varredura de tuning (pesos, pools,
+      normalização) congela em 50%/0,50 — os 3 misses são Pareto-dominados no cosseno. A alavanca restante é um
+      modelo mais forte, não mais tuning.</p>
+      <p style="margin:.6em 0 .2em"><b>O opt-in semântico custa:</b> ~507 MB em disco e ~1,3 GB de RSS extra —
+      por isso a feature <code>model2vec</code> segue desligada por padrão (embeddings rodam no worker do <code>ngd</code>, nunca no hook de &lt;5ms).</p>
+      <p style="margin:.6em 0 .2em"><b>precision@3 = 0,33</b> é teto aritmético (1 fato-ouro, k=3), não fraqueza de ranking.</p>
+    </div>
+  </section>
+
+  <div class="foot">
+    Fonte: <code>crates/ng-bench</code> · dados em <code>results/latest.json</code> · corpus fixo, sem <code>Date::now</code>/<code>rand</code>.
+    Reproduza: <code>cargo run -p ng-bench --release</code> · gates: <code>cargo test -p ng-bench --release</code>
+    (pisos por classe + anti-bajulação). Metodologia e auditoria completas: <code>with-vs-without.md</code>.
+  </div>
+</div>
+</body>
+</html>

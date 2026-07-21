@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  ci:
+    name: fmt + clippy + test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      # rusqlite is built with the "bundled" feature (see workspace
+      # Cargo.toml): SQLite's C sources are compiled from a vendored copy
+      # via the `libsqlite3-sys` build script. No `apt-get install
+      # libsqlite3-dev` (or any system package) is needed on this or any
+      # runner — the workspace has zero non-Rust system dependencies.
+      - name: Cache cargo/target
+        uses: Swatinem/rust-cache@v2
+
+      - name: cargo fmt --check
+        run: cargo fmt --all --check
+
+      - name: cargo clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      - name: cargo test
+        run: cargo test --workspace --release

@@ -1,0 +1,1 @@
+{"id":"msg_002","role":"assistant","content":[{"type":"text","text":"I'll add limit/offset query params and a total count header."},{"type":"tool_use","name":"edit","input":{"path":"items.rs"}}]}

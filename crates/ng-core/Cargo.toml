@@ -1,0 +1,46 @@
+[package]
+name = "ng-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+# The lib and integration tests carry no `#[bench]` fns; leaving their
+# default `bench = true` makes `cargo bench` invoke the libtest harness in
+# bench mode, which rejects criterion's flags (e.g. --warm-up-time). Opting
+# them out lets `cargo bench -p ng-core` run only the criterion benches.
+[lib]
+bench = false
+
+[[test]]
+name = "relevance"
+bench = false
+
+[dependencies]
+rusqlite.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+dirs.workspace = true
+model2vec-rs = { workspace = true, optional = true }
+
+[features]
+# Embedder semântico real por cima do trait `Embedder`. Desligado por padrão:
+# o build padrão do ng-core fica leve (zero deps de embedding), fiel à
+# restrição de não pesar o PC do usuário.
+model2vec = ["dep:model2vec-rs"]
+
+[dev-dependencies]
+tempfile = "3"
+criterion.workspace = true
+
+[[bench]]
+name = "search_bench"
+harness = false
+
+[[bench]]
+name = "graph_bench"
+harness = false
+
+[[bench]]
+name = "lex_embed_bench"
+harness = false
